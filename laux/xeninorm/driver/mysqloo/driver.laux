@@ -1,0 +1,4 @@
+public class XeninORM.Driver.MySQLOO extends XeninORM.Driver.BaseDriver
+  _get connection
+
+end

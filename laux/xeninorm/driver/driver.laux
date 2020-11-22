@@ -1,0 +1,13 @@
+public class XeninORM.Driver.BaseDriver extends XeninORM.Util.Interface
+  static __interface = true
+  static __toImplement = { 
+    "getConnection()",
+    "connect()",
+    "close()",
+    "query()",
+    "prepare()",
+    "begin()",
+    "commit()",
+    "rollback()"
+  }
+end

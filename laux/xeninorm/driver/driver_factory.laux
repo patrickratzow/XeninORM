@@ -1,0 +1,12 @@
+public class XeninORM.Driver.DriverFactory
+  static create(connection: XeninORM.Connection.Connection)
+    local { type } = connection.options
+
+    if (type == "mysql" or type == "mysqloo") then
+      return XeninORM.Driver.MySQLOO(connection)
+    elseif (type == "sqlite") then
+      return XeninORM.Driver.SQLite(connection)
+    end
+  end
+end
+

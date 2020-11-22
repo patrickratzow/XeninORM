@@ -1,0 +1,11 @@
+public class XeninORM.Connection.ConnectionManager
+  connections = {}
+
+  get(name)
+    return self.connections[name]
+  end
+
+  create(options: ConnectionOptions)
+
+  end
+end

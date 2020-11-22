@@ -1,0 +1,68 @@
+XeninORM = {}
+XeninORM.Util ||= {}
+XeninORM.Connection ||= {}
+XeninORM.Driver ||= {}
+
+local hasLoaded = {}
+local function loadFile(path)
+  stopif hasLoaded[path]
+
+  MsgC(Color(41, 128, 185), "[XeninORM] ", Color(0, 255, 0), `Loading ${path}\n`)
+
+  hasLoaded[path] = true
+
+  return include(path)
+end
+
+local function loadFolder(path)
+  local fullPath = `xeninorm/${path}`
+  local files, folders = file.Find(`${fullPath}/*`, "LUA")
+  for i, v in ipairs(files) do
+    loadFile(`${path}/${v}`)
+  end
+  for i, v in ipairs(folders) do
+    loadFolder(`${path}/${v}`)
+  end
+end
+
+-- Load util first
+loadFolder("util")
+loadFolder("connection")
+loadFolder("driver")
+
+-- Load the rest
+local files, folders = file.Find("xeninorm/*", "LUA")
+for i, v in ipairs(files) do
+  continueif v == "init.lua"
+
+  loadFile(v)
+end
+for i, v in ipairs(folders) do
+  loadFolder(v)
+end
+
+-- After everything is loaded make sure that all "implementations" of an "interface" is valid
+local checked = {}
+local function checkImplementations(tbl)
+  for i, v of tbl do
+    continueif checked[v]
+    continueif !istable(v)
+    continueif v.__name and checked[v.__name]
+
+    checked[v] = true
+
+    if (v.__testInterface) then
+      v.__testInterface(v)
+    end
+
+    continueif v.__name and !v.__parent
+
+    if (v.__parent) then
+      checkImplementations(v.__parent)
+    end
+    
+    checkImplementations(v)
+  end
+end
+
+checkImplementations(XeninORM)

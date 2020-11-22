@@ -1,0 +1,14 @@
+local Promise = XeninORM.Util.Promise
+
+public class XeninORM.Connection.Connection
+  constructor(options: table)
+    self.options = options
+    self.name = options.name or "default"
+    self.driver = XeninORM.Driver.DriverFactory(self)
+  end
+
+  connect()
+
+  end
+end
+

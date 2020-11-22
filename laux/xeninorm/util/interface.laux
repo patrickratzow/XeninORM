@@ -1,0 +1,97 @@
+local ERROR_RED = Color(215, 50, 50)
+local ERROR_BLUE = Color(125, 216, 230)
+local ERROR_GREEN = Color(74, 235, 150)
+local ERROR_YELLOW = Color(241, 196, 15)
+
+local function Print(color, msg)
+  local length = 2 + #msg
+  local padding = ""
+  for i = 1, 69 - length do
+    padding ..= " "
+  end
+
+  MsgC(ERROR_RED, "-", color, msg, ERROR_RED, padding .. "-\n")
+end
+
+public class XeninORM.Util.Interface
+  static __interface = true
+
+  static __findMemberRecursive(tbl, index)
+    if (tbl[index]) then
+      return tbl[index]
+    end
+
+    if (tbl.__parent) then
+      return XeninORM.Util.Interface.__findMemberRecursive(tbl.__parent, index)
+    end
+  end
+
+  static __findToImplement(tbl, members = {})
+    local toImplement = rawget(tbl, "__toImplement")
+    if (toImplement) then
+      for i, v in ipairs(toImplement) do
+        members[v] = true
+      end
+    end
+
+    if (tbl.__parent) then
+      return XeninORM.Util.Interface.__findToImplement(tbl.__parent, members)
+    end
+
+    local temp = {}
+    for i, v of members do
+      temp[#temp + 1] = i
+    end
+
+    -- Alphabetical
+    table.sort(temp, (a, b) => return a < b end)
+
+    return temp
+  end
+
+  static __testInterface(tbl)
+    -- Don't check internal interfaces
+    stopif rawget(tbl, "__interface")
+
+    if (!tbl.__toImplement) then 
+      error("You have to implement a static __toImplement table for this!")
+    end
+
+    local missing = {}
+    local toImplement = XeninORM.Util.Interface.__findToImplement(tbl)
+    for i, v in ipairs(toImplement) do
+      local isFunction = v:sub(v:len() - 1, v:len()) == "()"
+      local str = isFunction and v:sub(0, v:len() - 2) or v
+
+      local member = XeninORM.Util.Interface.__findMemberRecursive(tbl, str)
+      continueif member
+      
+      if (isFunction and !isfunction(member)) then
+        missing[#missing + 1] = {
+          info = "Function",
+          name = v
+        }
+
+        continue
+      end
+
+      missing[#missing + 1] = {
+        info = "Attribute",
+        name = v
+      }
+    end
+
+    stopif table.Count(missing) == 0
+
+    MsgC(ERROR_RED, "\n----------------------XeninORM Interface Error-----------------------\n")
+    Print(ERROR_BLUE, ` ${tbl.__name}`)
+    Print(ERROR_BLUE, " You need to implement the following members")
+    MsgC(ERROR_RED, "---------------------------------------------------------------------\n")
+    for i, v of missing do
+      local col = v.info == "Function" and ERROR_GREEN or ERROR_YELLOW
+      Print(col, ` * ${v.name} [${v.info}]`)
+    end
+    MsgC(ERROR_RED, "---------------------------------------------------------------------\n")
+
+  end
+end
