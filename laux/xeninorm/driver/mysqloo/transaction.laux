@@ -1,0 +1,31 @@
+public class XeninORM.Driver.MySQLOOTransaction extends XeninORM.Abstractions.Transaction
+  constructor(db)
+    super()
+
+    self.transaction = db:createTransaction()
+  end
+
+  addQuery(query)
+    self.transaction:addQuery(query)
+  end
+
+  getQueries()
+    return self.transaction:getQueries()
+  end
+
+  start()
+    local p = XeninUI.Promises.new()
+
+    self.transaction.onSuccess = (trans, data) =>
+      p:resolve(data)
+    end
+    self.transaction.onError = (trans, error) =>
+      p:reject(err)
+    end
+    self.transaction:start()
+
+    return p
+  end
+end
+
+XeninORM.Driver.MySQLOOTransaction.__testInterface(XeninORM.Driver.MySQLOOTransaction)
