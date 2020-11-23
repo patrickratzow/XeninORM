@@ -1,11 +1,15 @@
-public class XeninORM.Connection.ConnectionManager
+class ConnectionManager
   connections = {}
 
   get(name)
     return self.connections[name]
   end
 
-  create(options: ConnectionOptions)
+  create(options: table)
 
   end
+
+  __type() return "XeninORM.Connection.ConnectionManager" end
 end
+
+XeninORM.Connection.ConnectionManager ||= ConnectionManager()
