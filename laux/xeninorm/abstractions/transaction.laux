@@ -1,0 +1,9 @@
+public class XeninORM.Abstractions.Transaction extends XeninORM.Util.Interface
+  static __interface = true
+  static __toImplement = {
+    "start()",
+    "addQuery()",
+    "getQueries()"
+  }
+end
+

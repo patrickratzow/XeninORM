@@ -1,0 +1,6 @@
+public class XeninORM.Abstractions.Query extends XeninORM.Util.Interface
+  static __toImplement = {
+    "onSuccess()",
+    "onError()"
+  }
+end

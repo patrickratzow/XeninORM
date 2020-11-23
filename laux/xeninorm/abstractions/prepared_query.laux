@@ -1,0 +1,3 @@
+public class XeninORM.Abstractions.PreparedQuery extends XeninORM.Abstractions.Query
+
+end

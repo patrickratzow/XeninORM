@@ -1,5 +1,6 @@
 XeninORM = {}
 XeninORM.Util ||= {}
+XeninORM.Abstractions ||= {}
 XeninORM.Connection ||= {}
 XeninORM.Driver ||= {}
 
@@ -27,6 +28,7 @@ end
 
 -- Load util first
 loadFolder("util")
+loadFolder("abstractions")
 loadFolder("connection")
 loadFolder("driver")
 
