@@ -1,4 +1,110 @@
-public class XeninORM.Driver.MySQLOO extends XeninORM.Driver.BaseDriver
-  _get connection
+local Promises = XeninORM.Util.Promises
 
+public class XeninORM.Driver.MySQLOO extends XeninORM.Driver.BaseDriver
+  pool = {}
+
+  constructor(connection)
+    super()
+
+    self.connection = connection
+    self.options = self.connection.options
+    self.pool = XeninORM.Driver.MySQLOOPool(self)
+
+    self:loadDependencies()
+
+    --self:connect()
+  end
+
+  loadDependencies()
+    require("mysqloo")
+  end
+
+  connect()
+    local p = Promises.new()
+
+    if (#self.pool:getConnections() > 0) then return p:reject("Connection already established") end
+
+    local { host, user, password, database, port } = self.options
+    local connectionCount = self.options.connections or 1
+    local connectedCount = 0
+    for i = 1, connectionCount do
+      local conn = mysqloo.connect(host, user, password, database, port)
+      conn.onConnectionFailed = (conn, error) =>
+        ErrorNoHalt(error)
+        return p:reject(`Unable to establish connection for connection ID ${i}. Error:\n${error}`)
+      end
+      conn.onConnected = (conn) =>
+        connectedCount++
+
+        self.pool:addConnection(conn)
+
+        if (connectedCount == connectionCount) then
+          p:resolve(self.connection)
+        end
+      end
+      conn:connect()
+    end
+
+    return p
+  end
+
+  close()
+
+  end
+
+  begin()
+
+  end
+
+  close()
+
+  end
+
+  commit(transaction)
+
+  end
+
+  prepare(query: string)
+
+  end
+
+  query(query: string)
+    local p = Promises.new()
+
+    local obj = self:query(query)
+    function obj:onSuccess(data)
+      p:resolve(data)
+    end
+    function obj:onError(err)
+      p:reject(err)
+    end
+
+    return p
+  end
+
+  rollback(connection)
+    -- This doesn't really do anything
+    return Promises.new():resolve()
+  end
+
+  getConnection()
+    return Promise.new():resolve(self.pool:getBestConnection())
+  end
 end
+
+--[[
+local config = {
+  options = {
+    host = "localhost",
+    user = "root",
+    password = "root",
+    database = "xeninorm",
+    port = 3306,
+    connections = 10
+  }
+}
+local driver = XeninORM.Driver.MySQLOO(config)
+print("--------------" .. CurTime() .. "--------------")
+local p = driver:connect()
+  p:next(PrintTable, PrintTable)
+--]]
