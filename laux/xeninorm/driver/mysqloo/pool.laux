@@ -1,0 +1,49 @@
+public class XeninORM.Driver.MySQLOOPool extends XeninORM.Driver.BasePool
+  connections = {}
+
+  constructor(driver)
+    super()
+
+    self.driver = driver
+
+    -- Not sure how well this works, will see
+    local { host, user, password, database } = self.driver.options
+    local name = `mysqloo-${host}-${user}-${password}-${database}`
+    timer.Create(name, 30, 0, () =>
+      for i, v in ipairs(self.connections) do
+        local query = v:query("SELECT 1")
+        function query:onSuccess(data) end
+        function query:onError(err)
+          ErrorNoHalt("MySQL pooling error:\n" .. err .. "\n")
+
+          v:connect()
+        end
+
+        query:start()
+      end
+    end)
+  end
+
+  addConnection(connection)
+    table.insert(self.connections, connection)
+  end
+
+  getConnections()
+    return self.connections
+  end
+
+  getBestConnection()
+    local best
+    local count = 0
+    for i, v in ipairs(self.connections) do
+      local queueSize = v:queueSize()
+      if (!queueSize or queueSize < count) then
+        best = v
+
+        count += queueSize
+      end
+    end
+
+    return best
+  end
+end
