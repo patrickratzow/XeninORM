@@ -1,0 +1,8 @@
+public class XeninORM.Driver.BasePool extends XeninORM.Util.Interface
+  static __interface = true
+  static __toImplement = { 
+    "getConnections()",
+    "addConnection()",
+    "getBestConnection()"
+  }
+end
